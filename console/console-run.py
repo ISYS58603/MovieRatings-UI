@@ -45,11 +45,17 @@ class Term:
 
 def todo(txt):
     print(Term.blue(f"TODO: {txt}"))
+    input("Press Enter to continue...")
+
+def entry_error(txt="Invalid choice!"):
+    print(Term.red(txt))
+    input("Press Enter to continue...")
     
 def main_menu():
+    # Stay in the loo
     while True:
         Term.clear()
-        print("Welcome to the playlist creator!")
+        print("Welcome to the Movie Rating App!")
         print(Term.green("1) Work with users"))
         print(Term.green("2) Work with ratings"))
         print(Term.green("3) Work with movies"))
@@ -65,10 +71,33 @@ def main_menu():
             print(Term.blue("Goodbye!"))
             break
         else:
-            print(Term.red("Invalid choice!"))
+            entry_error()
 
 def manage_users():
-    pass
+    # Do this forever until the user chooses to go back
+    while True:
+        Term.clear()
+        print("User Management")
+        print(Term.green("1. Add User"))
+        print(Term.green("2. List Users"))
+        print(Term.green("3. Delete User"))
+        print(Term.green("4. Create new user"))
+        print(Term.green("5. Go back"))
+            
+        choice = input("Enter your choice: ")
+        if choice == '1':
+            todo("Add User")
+        elif choice == '2':
+            todo("List Users")
+        elif choice == '3':
+            todo("Delete User")
+        elif choice == '4':
+            todo("Create new user")
+        elif choice == '5':
+            return
+        else:
+            entry_error()
+    
 
 def manage_ratings():
     pass
