@@ -82,22 +82,19 @@ def manage_users():
     while True:
         Term.clear()
         print("User Management")
-        print(Term.green("1. Add User"))
+        print(Term.green("1. Create new user"))
         print(Term.green("2. List Users"))
         print(Term.green("3. Delete User"))
-        print(Term.green("4. Create new user"))
-        print(Term.green("5. Go back"))
-            
+        print(Term.green("4. Go back"))
+
         choice = input("Enter your choice: ")
         if choice == '1':
             add_user()
         elif choice == '2':
             list_users()
         elif choice == '3':
-            todo("Delete User")
+            delete_user()
         elif choice == '4':
-            todo("Create new user")
-        elif choice == '5':
             return
         else:
             entry_error()
@@ -128,6 +125,31 @@ def list_users():
     for user in users:
         print(f"User: {user['username']} - {user['email']}")
     input("Press Enter to continue...")
+
+def delete_user():
+    Term.clear()
+    print("Delete User")
+    user_name = input("Enter user name to delete: ")
+    response = requests.get(f"{BASE_URL}/users?contains={user_name}")
+    if response.status_code != 200 :
+        print(Term.red(f"Failed to list users: {response.text}"))
+        input("Press Enter to continue...")
+        return
+    users = response.json()
+    if len(users) == 0:
+        print(Term.red(f"No users found with name {user_name}"))
+        input("Press Enter to continue...")
+        return
+    for user in users:
+        print(f"ID: {user['id']}:  User: {user['username']} - {user['email']}")    
+    
+    user_id = input("Enter user ID to delete: ")
+    response = requests.delete(f"{BASE_URL}/users/{user_id}")
+    if response.status_code != 200:
+        print(Term.red(f"Failed to delete user: {response.text}"))
+        input("Press Enter to continue...")
+        return
+    print(f"Deleted user with ID {user_id}")
 
 def manage_ratings():
     pass
