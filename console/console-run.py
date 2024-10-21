@@ -2,6 +2,10 @@
 # for interacting with the Movie API. It is not a complete implementation.
 import os
 import platform
+import requests
+
+API_SERVER = "http://localhost:5000"
+BASE_URL = API_SERVER+"/api"
 
 class Term:
     '''
@@ -50,7 +54,7 @@ def todo(txt):
 def entry_error(txt="Invalid choice!"):
     print(Term.red(txt))
     input("Press Enter to continue...")
-    
+
 def main_menu():
     # Stay in the loo
     while True:
@@ -86,9 +90,9 @@ def manage_users():
             
         choice = input("Enter your choice: ")
         if choice == '1':
-            todo("Add User")
+            add_user()
         elif choice == '2':
-            todo("List Users")
+            list_users()
         elif choice == '3':
             todo("Delete User")
         elif choice == '4':
@@ -97,7 +101,33 @@ def manage_users():
             return
         else:
             entry_error()
-    
+
+def add_user():
+    Term.clear()
+    print("Add User")
+    username = input("Enter user name: ")
+    email = input("Enter user email: ")
+    response = requests.post(
+        f"{BASE_URL}/users", json={"username": username, "email": email}
+    )
+    if response.status_code != 201:
+        print(Term.red(f"Failed to add user: {response.text}"))
+        input("Press Enter to continue...")
+        return
+    print(f"Added user {username} with email {email}")
+
+def list_users():
+    Term.clear()
+    print("List Users")
+    response = requests.get(f"{BASE_URL}/users")
+    if response.status_code != 200:
+        print(Term.red(f"Failed to list users: {response.text}"))
+        input("Press Enter to continue...")
+        return
+    users = response.json()
+    for user in users:
+        print(f"User: {user['username']} - {user['email']}")
+    input("Press Enter to continue...")
 
 def manage_ratings():
     pass
