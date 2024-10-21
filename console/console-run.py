@@ -2,6 +2,10 @@
 # for interacting with the Movie API. It is not a complete implementation.
 import os
 import platform
+import requests
+
+API_SERVER = "http://localhost:5000"
+BASE_URL = API_SERVER+"/api"
 
 class Term:
     '''
@@ -45,11 +49,17 @@ class Term:
 
 def todo(txt):
     print(Term.blue(f"TODO: {txt}"))
-    
+    input("Press Enter to continue...")
+
+def entry_error(txt="Invalid choice!"):
+    print(Term.red(txt))
+    input("Press Enter to continue...")
+
 def main_menu():
+    # Stay in the loo
     while True:
         Term.clear()
-        print("Welcome to the playlist creator!")
+        print("Welcome to the Movie Rating App!")
         print(Term.green("1) Work with users"))
         print(Term.green("2) Work with ratings"))
         print(Term.green("3) Work with movies"))
@@ -65,10 +75,81 @@ def main_menu():
             print(Term.blue("Goodbye!"))
             break
         else:
-            print(Term.red("Invalid choice!"))
+            entry_error()
 
 def manage_users():
-    pass
+    # Do this forever until the user chooses to go back
+    while True:
+        Term.clear()
+        print("User Management")
+        print(Term.green("1. Create new user"))
+        print(Term.green("2. List Users"))
+        print(Term.green("3. Delete User"))
+        print(Term.green("4. Go back"))
+
+        choice = input("Enter your choice: ")
+        if choice == '1':
+            add_user()
+        elif choice == '2':
+            list_users()
+        elif choice == '3':
+            delete_user()
+        elif choice == '4':
+            return
+        else:
+            entry_error()
+
+def add_user():
+    Term.clear()
+    print("Add User")
+    username = input("Enter user name: ")
+    email = input("Enter user email: ")
+    response = requests.post(
+        f"{BASE_URL}/users", json={"username": username, "email": email}
+    )
+    if response.status_code != 201:
+        print(Term.red(f"Failed to add user: {response.text}"))
+        input("Press Enter to continue...")
+        return
+    print(f"Added user {username} with email {email}")
+
+def list_users():
+    Term.clear()
+    print("List Users")
+    response = requests.get(f"{BASE_URL}/users")
+    if response.status_code != 200:
+        print(Term.red(f"Failed to list users: {response.text}"))
+        input("Press Enter to continue...")
+        return
+    users = response.json()
+    for user in users:
+        print(f"User: {user['username']} - {user['email']}")
+    input("Press Enter to continue...")
+
+def delete_user():
+    Term.clear()
+    print("Delete User")
+    user_name = input("Enter user name to delete: ")
+    response = requests.get(f"{BASE_URL}/users?contains={user_name}")
+    if response.status_code != 200 :
+        print(Term.red(f"Failed to list users: {response.text}"))
+        input("Press Enter to continue...")
+        return
+    users = response.json()
+    if len(users) == 0:
+        print(Term.red(f"No users found with name {user_name}"))
+        input("Press Enter to continue...")
+        return
+    for user in users:
+        print(f"ID: {user['id']}:  User: {user['username']} - {user['email']}")    
+    
+    user_id = input("Enter user ID to delete: ")
+    response = requests.delete(f"{BASE_URL}/users/{user_id}")
+    if response.status_code != 200:
+        print(Term.red(f"Failed to delete user: {response.text}"))
+        input("Press Enter to continue...")
+        return
+    print(f"Deleted user with ID {user_id}")
 
 def manage_ratings():
     pass
