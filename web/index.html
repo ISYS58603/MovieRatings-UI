@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies API Interaction</title>
+    <style>
+        #movies-list {
+            width: 300px;
+            height: 150px;
+        }
+    </style>
+    <script>
+        // Function to load movies from the API and populate the listbox
+        async function loadMovies() {
+            try {
+                const response = await fetch('http://localhost:5000/api/movies');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const movies = await response.json();
+                const listbox = document.getElementById("movies-list");
+                listbox.innerHTML = ''; // Clear previous entries
+                movies.forEach(movie => {
+                    const option = document.createElement("option");
+                    option.value = movie.movie_id;
+                    option.text = movie.title;
+                    listbox.add(option);
+                });
+            } catch (error) {
+                console.error('There was a problem fetching the movies:', error);
+            }
+        }
+
+        // Function to get ratings for a selected movie
+        async function getMovieRatings() {
+            const listbox = document.getElementById("movies-list");
+            const selectedMovieId = listbox.value;
+            if (!selectedMovieId) {
+                alert("Please select a movie to get ratings.");
+                return;
+            }
+            try {
+                const response = await fetch(`http://localhost:5000/api/movies/${selectedMovieId}/ratings`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const ratings = await response.json();
+                document.getElementById("ratings-result").innerText = JSON.stringify(ratings, null, 2);
+            } catch (error) {
+                console.error('There was a problem fetching the ratings:', error);
+            }
+        }
+
+        // Load movies when the page is loaded
+        window.onload = loadMovies;
+    </script>
+</head>
+<body>
+    <h1>Movies List</h1>
+    <select id="movies-list" size="10"></select>
+    <br><br>
+    <button onclick="getMovieRatings()">Get Ratings</button>
+    <pre id="ratings-result"></pre>
+</body>
+</html>
