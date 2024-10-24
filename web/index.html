@@ -6,15 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movies API Interaction</title>
     <style>
+               #container {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px; /* Space between the listbox and the table */
+        }
+
         #movies-list {
             width: 300px;
-            height: 150px;
+            height: 300px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 0;
         }
 
         th,
@@ -26,6 +32,11 @@
 
         th {
             background-color: #f4f4f4;
+        }
+
+        /* Set a fixed width for the table to fit beside the movie list */
+        #ratings-table {
+            width: 400px;
         }
     </style>
     <script>
@@ -109,22 +120,29 @@
 
 <body>
     <h1>Movies List</h1>
-    <select id="movies-list" size="10"></select>
-    <br><br>
-    <button onclick="getMovieRatings()">Get Ratings</button>
-
-    <div id="ratings-container">
-        <table id="ratings-table" style="display:none;">
-            <thead>
-                <tr>
-                    <th>Source</th>
-                    <th>Rating</th>
-                </tr>
-            </thead>
-            <tbody id="ratings-result">
-                <!-- Ratings will be populated here -->
-            </tbody>
-        </table>
+    <!-- Container for flex layout -->
+    <div id="container">
+        <!-- Movie list (left side) -->
+        <div>
+            <select id="movies-list" size="10"></select>
+            <br><br>
+            <button onclick="getMovieRatings()">Get Ratings</button>
+        </div>
+    
+        <!-- Ratings table (right side) -->
+        <div id="ratings-container">
+            <table id="ratings-table" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody id="ratings-result">
+                    <!-- Ratings will be populated here -->
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 
