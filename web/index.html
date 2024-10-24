@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,23 @@
         #movies-list {
             width: 300px;
             height: 150px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
         }
     </style>
     <script>
@@ -45,22 +63,69 @@
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                const ratings = await response.json();
-                document.getElementById("ratings-result").innerText = JSON.stringify(ratings, null, 2);
+                const movie = await response.json();
+                populateRatingsTable(movie.ratings);
             } catch (error) {
                 console.error('There was a problem fetching the ratings:', error);
             }
         }
+        // Function to populate the ratings table
+        function populateRatingsTable(ratings) {
+            const table = document.getElementById("ratings-table");
+            const tableBody = document.getElementById("ratings-result");
 
-        // Load movies when the page is loaded
-        window.onload = loadMovies;
+            // Clear previous results
+            tableBody.innerHTML = "";
+
+            // Check if there are any ratings to display
+            if (ratings.length === 0) {
+                tableBody.innerHTML = "<tr><td colspan='2'>No ratings found</td></tr>";
+            } else {
+                // Populate the table with ratings
+                ratings.forEach(rating => {
+                    const row = document.createElement("tr");
+
+                    // Source of the rating
+                    const sourceCell = document.createElement("td");
+                    sourceCell.innerText = rating.rating || "Unknown";
+                    row.appendChild(sourceCell);
+
+                    // Rating value
+                    const ratingCell = document.createElement("td");
+                    ratingCell.innerText = rating.review || "N/A";
+                    row.appendChild(ratingCell);
+
+                    // Append the row to the table body
+                    tableBody.appendChild(row);
+                });
+            }
+             // Show the table after populating
+            table.style.display = "table";
+        }
+                // Load movies when the page is loaded
+                window.onload = loadMovies;
     </script>
 </head>
+
 <body>
     <h1>Movies List</h1>
     <select id="movies-list" size="10"></select>
     <br><br>
     <button onclick="getMovieRatings()">Get Ratings</button>
-    <pre id="ratings-result"></pre>
+
+    <div id="ratings-container">
+        <table id="ratings-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Rating</th>
+                </tr>
+            </thead>
+            <tbody id="ratings-result">
+                <!-- Ratings will be populated here -->
+            </tbody>
+        </table>
+    </div>
 </body>
+
 </html>
