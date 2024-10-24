@@ -12,6 +12,11 @@ To run the application, you will need to have Python installed on your computer.
 
 - Next you will want to have the API running (see the documenation for the api).
 
+Ensure that you have all the python packages required installed. You can install the required packages by running the following command in the terminal:
+```bash
+pip install -r requirements.txt
+```
+
 Then chose the interface you would like to use:
 - For the console interface, run the following command in the terminal:
 ```bash
