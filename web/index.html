@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies API Interaction</title>
+    <style>
+               #container {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px; /* Space between the listbox and the table */
+        }
+
+        #movies-list {
+            width: 300px;
+            height: 300px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        /* Set a fixed width for the table to fit beside the movie list */
+        #ratings-table {
+            width: 400px;
+        }
+    </style>
+    <script>
+        // Function to load movies from the API and populate the listbox
+        async function loadMovies() {
+            try {
+                const response = await fetch('http://localhost:5000/api/movies');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const movies = await response.json();
+                const listbox = document.getElementById("movies-list");
+                listbox.innerHTML = ''; // Clear previous entries
+                movies.forEach(movie => {
+                    const option = document.createElement("option");
+                    option.value = movie.movie_id;
+                    option.text = movie.title;
+                    listbox.add(option);
+                });
+            } catch (error) {
+                console.error('There was a problem fetching the movies:', error);
+            }
+        }
+
+        // Function to get ratings for a selected movie
+        async function getMovieRatings() {
+            const listbox = document.getElementById("movies-list");
+            const selectedMovieId = listbox.value;
+            if (!selectedMovieId) {
+                alert("Please select a movie to get ratings.");
+                return;
+            }
+            try {
+                const response = await fetch(`http://localhost:5000/api/movies/${selectedMovieId}/ratings`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const movie = await response.json();
+                populateRatingsTable(movie.ratings);
+            } catch (error) {
+                console.error('There was a problem fetching the ratings:', error);
+            }
+        }
+        // Function to populate the ratings table
+        function populateRatingsTable(ratings) {
+            const table = document.getElementById("ratings-table");
+            const tableBody = document.getElementById("ratings-result");
+
+            // Clear previous results
+            tableBody.innerHTML = "";
+
+            // Check if there are any ratings to display
+            if (ratings.length === 0) {
+                tableBody.innerHTML = "<tr><td colspan='2'>No ratings found</td></tr>";
+            } else {
+                // Populate the table with ratings
+                ratings.forEach(rating => {
+                    const row = document.createElement("tr");
+
+                    // Source of the rating
+                    const sourceCell = document.createElement("td");
+                    sourceCell.innerText = rating.rating || "Unknown";
+                    row.appendChild(sourceCell);
+
+                    // Rating value
+                    const ratingCell = document.createElement("td");
+                    ratingCell.innerText = rating.review || "N/A";
+                    row.appendChild(ratingCell);
+
+                    // Append the row to the table body
+                    tableBody.appendChild(row);
+                });
+            }
+             // Show the table after populating
+            table.style.display = "table";
+        }
+                // Load movies when the page is loaded
+                window.onload = loadMovies;
+    </script>
+</head>
+
+<body>
+    <h1>Movies List</h1>
+    <!-- Container for flex layout -->
+    <div id="container">
+        <!-- Movie list (left side) -->
+        <div>
+            <select id="movies-list" size="10"></select>
+            <br><br>
+            <button onclick="getMovieRatings()">Get Ratings</button>
+        </div>
+    
+        <!-- Ratings table (right side) -->
+        <div id="ratings-container">
+            <table id="ratings-table" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody id="ratings-result">
+                    <!-- Ratings will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
